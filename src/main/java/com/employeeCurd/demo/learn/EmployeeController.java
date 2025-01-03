@@ -1,5 +1,6 @@
 package com.employeeCurd.demo.learn;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -54,7 +55,7 @@ public class EmployeeController {
         } catch (EmployeeNotFoundException e) {
             return ResponseEntity.status(404).body(e.getMessage());
         } catch (InvalidEmployeeDataException e) {
-            return ResponseEntity.status(400).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body("An error occurred: " + e.getMessage());
