@@ -71,6 +71,7 @@ public class EmployeeServices {
 
         // Track changes for phone number
         if (employeeDTO.getPhoneNumber() != null && !employeeDTO.getPhoneNumber().equals(employee.getPhoneNumber())) {
+            // Record Phone number change history
             EmployeePhoneNumberChange phoneNumberChange = new EmployeePhoneNumberChange();
             phoneNumberChange.setEmployeeId(employee.getId());
             phoneNumberChange.setOldPhoneNumber(employee.getPhoneNumber());
