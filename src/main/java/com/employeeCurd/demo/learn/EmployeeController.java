@@ -39,9 +39,9 @@ public class EmployeeController {
             employeeServices.createEmployeeFromDTO(newEmployee);
             return ResponseEntity.ok("Employee created successfully");
         } catch (InvalidEmployeeDataException e) {
-            return ResponseEntity.status(400).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("An internal error occurred: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("An internal error occurred: " + e.getMessage());
 
         }
     }
@@ -58,7 +58,7 @@ public class EmployeeController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body("An error occurred: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("An error occurred: " + e.getMessage());
         }
     }
 
@@ -70,10 +70,10 @@ public class EmployeeController {
             employeeServices.deleteEmployee(id); // Highlighted: Deleting via service
             return ResponseEntity.ok("Employee with ID " + id + " has been deleted."); // Highlighted: Success response
         } catch (EmployeeNotFoundException e) {
-            return ResponseEntity.status(400).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             // Handle the case when the employee is not found
-            return ResponseEntity.status(500).body("An internal error occurred: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("An internal error occurred: " + e.getMessage());
         }
     }
 }

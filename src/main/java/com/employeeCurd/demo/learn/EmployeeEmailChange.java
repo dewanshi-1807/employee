@@ -64,5 +64,3 @@ public class EmployeeEmailChange {
         this.changeTime = changeTime;
     }
 }
-
-// done
