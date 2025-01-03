@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "employee_phonenumber")
 public class EmployeePhoneNumberChange {
-// to update phonr number
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
