@@ -3,6 +3,11 @@ package com.employeeCurd.demo.learn;
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
 
 @Entity
 @Table(name = "employee")
@@ -17,6 +22,7 @@ public class Employee {
 
 // Getters and Setters
     public Long getId() {
+
         return id;
     }
 
