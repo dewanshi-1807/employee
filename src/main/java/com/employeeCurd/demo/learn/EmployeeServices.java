@@ -11,16 +11,11 @@ import java.util.Optional;
 public class EmployeeServices {
 
     private final EmployeeRepository employeeRepository;
-    private final EmployeeEmailRepository employeeEmailRepository;
-    private final EmployeePhoneNumberRepository employeePhoneNumberRepository;
-
+private final EmployeeDetailsRepository employeeDetailsRepository;
     // Constructor injection for repositories
-    public EmployeeServices(EmployeeRepository employeeRepository,
-                            EmployeeEmailRepository employeeEmailRepository,
-                            EmployeePhoneNumberRepository employeePhoneNumberRepository) {
+    public EmployeeServices(EmployeeRepository employeeRepository, EmployeeDetailsRepository employeeDetailsRepository) {
         this.employeeRepository = employeeRepository;
-        this.employeeEmailRepository = employeeEmailRepository;
-        this.employeePhoneNumberRepository = employeePhoneNumberRepository;
+        this.employeeDetailsRepository = employeeDetailsRepository;
     }
 
     // Retrieve all employees
@@ -37,7 +32,25 @@ public class EmployeeServices {
         employee.setEmail(employeeDTO.getEmail());
         employee.setPhoneNumber(employeeDTO.getPhoneNumber());
 
-        return employeeRepository.save(employee);
+        Employee savedEmployee = employeeRepository.save(employee);
+
+        // Save initial details in employee_details table
+        EmployeeDetails employeeDetails = new EmployeeDetails();
+//        employeeDetails.setEmployeeId(savedEmployee.getId());
+        employeeDetails.setId(savedEmployee.getId());
+        employeeDetails.setOldEmail(null); // No old email on creation
+        employeeDetails.setNewEmail(employeeDTO.getEmail());
+        employeeDetails.setEmailChangeTime(LocalDateTime.now());
+
+        employeeDetails.setOldPhoneNumber(null); // No old phone number on creation
+        employeeDetails.setNewPhoneNumber(employeeDTO.getPhoneNumber());
+        employeeDetails.setPhoneNumberChangeTime(LocalDateTime.now());
+
+        employeeDetails.setCreateDate(LocalDateTime.now());
+
+        employeeDetailsRepository.save(employeeDetails);
+
+        return savedEmployee;
     }
 
     private void validateEmployeeDTO(EmployeeDTO employeeDTO) {
@@ -62,59 +75,40 @@ public class EmployeeServices {
 
     // Update employee details
     @Transactional
-    public void updateEmployee(Long id, EmployeeDTO employeeDTO) {
+    public void updateEmployeeFromDTO(Long id, EmployeeDTO employeeDTO) {
         // Find the employee by ID, or throw exception if not found
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Employee not found with ID: " + id));
 
+        EmployeeDetails employeeDetails = new EmployeeDetails();
+        employeeDetails.setEmployee(employee); // Link to Employee
+        employeeDetails.setCreateDate(LocalDateTime.now());
+
         // Track changes for email
         if (employeeDTO.getEmail() != null && !employeeDTO.getEmail().equals(employee.getEmail())) {
-            // Record email change history
-            EmployeeEmailChange emailChange = new EmployeeEmailChange();
-            emailChange.setEmployeeId(employee.getId());
-            emailChange.setOldEmail(employee.getEmail());
-            emailChange.setNewEmail(employeeDTO.getEmail());
-            emailChange.setChangeTime(LocalDateTime.now());
-            employeeEmailRepository.save(emailChange);
-
-            // Update email in the employee table
+            employeeDetails.setOldEmail(employee.getEmail());
+            employeeDetails.setNewEmail(employeeDTO.getEmail());
+            employeeDetails.setEmailChangeTime(LocalDateTime.now());
             employee.setEmail(employeeDTO.getEmail());
         }
+
         // Track changes for phone number
         if (employeeDTO.getPhoneNumber() != null && !employeeDTO.getPhoneNumber().equals(employee.getPhoneNumber())) {
-            // Record phone number change history
-            EmployeePhoneNumberChange phoneNumberChange = new EmployeePhoneNumberChange();
-            phoneNumberChange.setEmployeeId(employee.getId());
-            phoneNumberChange.setOldPhoneNumber(employee.getPhoneNumber());
-            phoneNumberChange.setNewPhoneNumber(employeeDTO.getPhoneNumber());
-            phoneNumberChange.setChangeTime(LocalDateTime.now());
-            employeePhoneNumberRepository.save(phoneNumberChange);
-
-            // Update phone number in the employee table
+            employeeDetails.setOldPhoneNumber(employee.getPhoneNumber());
+            employeeDetails.setNewPhoneNumber(employeeDTO.getPhoneNumber());
+            employeeDetails.setPhoneNumberChangeTime(LocalDateTime.now());
             employee.setPhoneNumber(employeeDTO.getPhoneNumber());
         }
 
         // Save the updated employee
         employeeRepository.save(employee);
-    }
 
-    // Update employee phone number only
-    @Transactional
-    public void updatePhoneNumber(EmployeePhoneNumber phoneNumber) {
-        if (phoneNumber.getPhoneNumber() == null) {
-            throw new IllegalArgumentException("Phone number cannot be null");
-        }
-        employeePhoneNumberRepository.save(phoneNumber);
-    }
-
-    // Delete an employee by ID
-    public void deleteEmployee(Long id) {
-        if (employeeRepository.existsById(id)) {
-            employeeRepository.deleteById(id);
-        } else {
-            throw new EmployeeNotFoundException("Employee not found with ID: " + id);
+        // Save employee details if changes exist
+        if (employeeDetails.getOldEmail() != null || employeeDetails.getOldPhoneNumber() != null) {
+            employeeDetailsRepository.save(employeeDetails);
         }
     }
+
 }
 
 

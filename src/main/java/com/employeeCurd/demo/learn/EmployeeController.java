@@ -61,20 +61,20 @@ public class EmployeeController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("An error occurred: " + e.getMessage());
         }
     }
-
-    //DELETE: Remove an employee by ID*
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteEmployee(@PathVariable Long id) {
-        try {
-            // Delete the employee from the database
-            employeeServices.deleteEmployee(id); // Highlighted: Deleting via service
-            return ResponseEntity.ok("Employee with ID " + id + " has been deleted."); // Highlighted: Success response
-        } catch (EmployeeNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            // Handle the case when the employee is not found
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("An internal error occurred: " + e.getMessage());
-        }
-    }
+//
+//    //DELETE: Remove an employee by ID*
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<String> deleteEmployee(@PathVariable Long id) {
+//        try {
+//            // Delete the employee from the database
+//            employeeServices.deleteEmployee(id); // Highlighted: Deleting via service
+//            return ResponseEntity.ok("Employee with ID " + id + " has been deleted."); // Highlighted: Success response
+//        } catch (EmployeeNotFoundException e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+//        } catch (Exception e) {
+//            // Handle the case when the employee is not found
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("An internal error occurred: " + e.getMessage());
+//        }
+//    }
 }
 

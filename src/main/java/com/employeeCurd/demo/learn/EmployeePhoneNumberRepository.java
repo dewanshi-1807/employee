@@ -6,6 +6,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface EmployeePhoneNumberRepository<EmployeePhoneNumberChange> extends JpaRepository<EmployeePhoneNumberChange, Long> {
+public interface EmployeePhoneNumberRepository extends JpaRepository<EmployeePhoneNumberChange, Long> {
 //     EmployeePhoneNumberChange getByPhoneNumber (long phonenumber);
 }
