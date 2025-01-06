@@ -4,7 +4,7 @@ import jakarta.persistence.*;
         import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "employee_phonenumber")
+@Table(name = "employee_phone_number_changes")
 public class EmployeePhoneNumberChange {
 
     @Id
@@ -14,7 +14,7 @@ public class EmployeePhoneNumberChange {
     @Column(name = "employee_id", nullable = false)
     private Long employeeId;
 
-    @Column(name = "old_phone_number", nullable = true)
+    @Column(name = "old_phone_number", nullable = false)
     private String oldPhoneNumber;
 
     @Column(name = "new_phone_number", nullable = false)
@@ -24,6 +24,7 @@ public class EmployeePhoneNumberChange {
     private LocalDateTime changeTime;
 
     // Getters and Setters
+
     public Long getId() {
         return id;
     }
@@ -63,5 +64,17 @@ public class EmployeePhoneNumberChange {
     public void setChangeTime(LocalDateTime changeTime) {
         this.changeTime = changeTime;
     }
-}
 
+    // toString method for debugging
+
+    @Override
+    public String toString() {
+        return "EmployeePhoneNumberChange{" +
+                "id=" + id +
+                ", employeeId=" + employeeId +
+                ", oldPhoneNumber='" + oldPhoneNumber + '\'' +
+                ", newPhoneNumber='" + newPhoneNumber + '\'' +
+                ", changeTime=" + changeTime +
+                '}';
+    }
+}
