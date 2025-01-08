@@ -1,67 +1,89 @@
 package com.employeeCurd.demo.learn;
 
+import com.employeeCurd.demo.learn.Entity.Employee;
+import com.employeeCurd.demo.learn.Entity.EmployeeDetails;
+import com.employeeCurd.demo.learn.Repository.EmployeeDetailsRepository;
+import jakarta.persistence.EntityNotFoundException;
+import com.employeeCurd.demo.learn.InvalidEmployeeDataException;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/employee")
 public class EmployeeController {
 
     private final EmployeeServices employeeServices;
-    private EmployeeRepository employeeRepository;
 
-    private final List<Employee> employeeList = new ArrayList<>();
+    @Autowired
+    private EmployeeServices employeeService;
 
-// Constructor injection for EmployeeServices
+    private static final Logger log = LoggerFactory.getLogger(EmployeeController.class);  // Initialize logger
+
     public EmployeeController(EmployeeServices employeeServices) {
         this.employeeServices = employeeServices;
     }
 
-    // GET: Retrieve all employees*
-    @GetMapping
-    public List<Employee> getEmployees() {
-        //return employeeList;
-        return this.employeeServices.getAllEmployees();
-    }
 
-    // POST: Add a new employee*
-    @PostMapping("/create")
-    public ResponseEntity<String> addEmployee(@Validated @RequestBody EmployeeDTO newEmployee) {
+    // GET: Retrieve employee details by phone number
+    @GetMapping("/{phoneNumber}")
+    public ResponseEntity<EmployeeDetails> getEmployeeDetailsByPhoneNumber(@PathVariable String phoneNumber) {
+        if (phoneNumber == null || phoneNumber.isBlank()) {
+            log.warn("Invalid phone number provided: {}", phoneNumber);
+            throw new InvalidEmployeeDataException("Phone number cannot be null or blank");
+        }
+
         try {
-            employeeServices.createEmployeeFromDTO(newEmployee);
-            return ResponseEntity.ok("Employee created successfully");
-        } catch (InvalidEmployeeDataException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("An internal error occurred: " + e.getMessage());
+            // Retrieve employee details by phone number
+            List<EmployeeDetails> employeeDetailsList = employeeServices.getEmployeeDetailsByPhoneNumber(phoneNumber);
 
+            // If no employee details are found, return 404
+            if (employeeDetailsList.isEmpty()) {
+                log.warn("No employee details found for phone number: {}", phoneNumber);
+                throw new EntityNotFoundException("No employee details found for phone number: " + phoneNumber);
+            }
+            // Return the first employee details found
+            EmployeeDetails employeeDetails = employeeDetailsList.get(0);
+            log.info("Employee details retrieved for phone number: {}", phoneNumber);
+            return ResponseEntity.ok(employeeDetails);
+
+        } catch (EntityNotFoundException ex) {
+            log.error("Employee details not found for phone number: {}", phoneNumber);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (InvalidEmployeeDataException ex) {
+            log.error("Invalid data for phone number: {}", phoneNumber);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        } catch (Exception ex) {
+            log.error("Unexpected error while retrieving employee details", ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
-    // PUT: Update an existing employee*
-    @PutMapping("/{id}")
-    public ResponseEntity<String> updateEmployee(@PathVariable Long id, @Validated @RequestBody EmployeeDTO employeeDTO) {
+
+    // POST: Add a new employee
+    @PostMapping ("/create")
+    public ResponseEntity<Employee> createEmployee(@RequestBody Employee employee) {
         try {
-            employeeServices.updateEmployeeFromDTO(id, employeeDTO);
-            return ResponseEntity.ok("Employee updated successfully");
-        } catch (EmployeeNotFoundException e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        } catch (InvalidEmployeeDataException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            Employee savedEmployee = employeeService.saveEmployee(employee);
+            return new ResponseEntity<>(savedEmployee, HttpStatus.CREATED);
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("An error occurred: " + e.getMessage());
+            e.printStackTrace();  // Log the exception
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-//
+}
+
+
+
 //    //DELETE: Remove an employee by ID*
 //    @DeleteMapping("/{id}")
 //    public ResponseEntity<String> deleteEmployee(@PathVariable Long id) {
@@ -76,5 +98,5 @@ public class EmployeeController {
 //            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("An internal error occurred: " + e.getMessage());
 //        }
 //    }
-}
+
 

@@ -1,4 +1,4 @@
-package com.employeeCurd.demo.learn;
+package com.employeeCurd.demo.learn.Entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
