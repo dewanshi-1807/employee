@@ -1,5 +1,6 @@
 package com.employeeCurd.demo.learn.Repository;
 
+import com.employeeCurd.demo.learn.Entity.Employee;
 import com.employeeCurd.demo.learn.Entity.EmployeeDetails;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -14,9 +15,11 @@ import java.util.Optional;
     //List<EmployeeDetails> findByNewEmail(String email);
 //}
 @Repository
-public interface EmployeeDetailsRepository extends JpaRepository<EmployeeDetails, Long> {
     // New method to find by new phone number
-    @Query("SELECT e FROM EmployeeDetails e WHERE e.newPhoneNumber = :phoneNumber")
-    List<EmployeeDetails> findByNewPhoneNumber(String phoneNumber);
-}
+   // @Query("SELECT e FROM EmployeeDetails e WHERE e.newPhoneNumber = :phoneNumber")
 
+public interface EmployeeDetailsRepository extends JpaRepository<EmployeeDetails, Long> {
+
+    // Add the method to find employee details by employee
+    List<EmployeeDetails> findByPhoneNumber(String phoneNumber);
+}

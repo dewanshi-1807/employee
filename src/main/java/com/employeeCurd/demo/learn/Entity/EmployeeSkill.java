@@ -1,7 +1,9 @@
 package com.employeeCurd.demo.learn.Entity;
 
 import jakarta.persistence.*;
-        import java.util.HashSet;
+
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -16,13 +18,15 @@ public class EmployeeSkill {
     private String skillName;
 
     // Many-to-Many relationship with Employee
-    @ManyToMany
-    @JoinTable(
-            name = "employee_skill",  // Join table name
-            joinColumns = @JoinColumn(name = "skill_id"),  // Column referring to EmployeeSkill
-            inverseJoinColumns = @JoinColumn(name = "employee_id")  // Column referring to Employee
-    )
-    private List<Employee> employees;
+    //@ManyToMany
+    //@JoinTable(
+      //      name = "employee_skill",  // Join table name
+        //    joinColumns = @JoinColumn(name = "skill_id"),  // Column referring to EmployeeSkill
+          //  inverseJoinColumns = @JoinColumn(name = "employee_id")  // Column referring to Employee
+    //)
+
+    @ManyToMany(mappedBy = "skills")
+    private List<Employee> employees = new ArrayList<>();
 
     // Getters and Setters
     public Long getId() {

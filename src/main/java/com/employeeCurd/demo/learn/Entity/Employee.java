@@ -7,8 +7,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "employee")
@@ -16,7 +16,7 @@ public class Employee {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    //@Column(name = "id", nullable = false)
     private Long id;
 
     private String name;
@@ -24,19 +24,25 @@ public class Employee {
     private String phoneNumber;
 
     // Many-to-Many relationship with EmployeeSkill
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
-            name = "employee_skill",  // Join table name
+            name = "employee_skill_mapping",  // Join table name
             joinColumns = @JoinColumn(name = "employee_id"),  // Column referring to Employee
             inverseJoinColumns = @JoinColumn(name = "skill_id")  // Column referring to EmployeeSkill
     )
-    private List<EmployeeSkill> skills;
+    private List<EmployeeSkill> skills = new ArrayList<>();
+
+    // @OneToOne(cascade = CascadeType.ALL)
+    //@JoinColumn(name = "address_id", referencedColumnName = "id")
+
+    @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
+    private EmployeeAddress employeeAddress;
 
     // One-to-One relationship with EmployeeAddress
     //@OneToOne(cascade = CascadeType.ALL)
-   // @JoinColumn(name = "address_id")  // Foreign key in Employee table
+    // @JoinColumn(name = "address_id")  // Foreign key in Employee table
     //private RabbitConnectionDetails.EmployeeAddress employeeaddress;  // Correct relationship field
-   // private EmployeeAddress employeeAddress;
+    // private EmployeeAddress employeeAddress;
 
     //@OneToMany(mappedBy = "employee") // Example
     //private Set<EmployeeSkill> employeeSkill;
@@ -82,13 +88,14 @@ public class Employee {
         this.skills = skills;
     }
 
-    //public EmployeeAddress getEmployeeAddress() {
-      //  return employeeAddress;
+    public EmployeeAddress getEmployeeAddress() {
+        return employeeAddress;
     }
 
-    //public void setEmployeeAddress(EmployeeAddress employeeAddress) {
-      //  this.employeeAddress = employeeAddress;
-    //}
-//}
+    public void setEmployeeAddress(EmployeeAddress employeeAddress) {
+        this.employeeAddress = employeeAddress;
+    }
+    }
+
 
 

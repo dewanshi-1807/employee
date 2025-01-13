@@ -14,6 +14,9 @@ public class EmployeeDetails {
     @JoinColumn(name = "employee_id", nullable = false)
     private Employee employee;
 
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
     @Column(name = "old_email")
     private String oldEmail;
 

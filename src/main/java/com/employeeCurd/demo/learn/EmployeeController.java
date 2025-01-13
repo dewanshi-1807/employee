@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,15 +25,12 @@ public class EmployeeController {
 
     private final EmployeeServices employeeServices;
 
-    @Autowired
-    private EmployeeServices employeeService;
-
-    private static final Logger log = LoggerFactory.getLogger(EmployeeController.class);  // Initialize logger
-
+@Autowired
     public EmployeeController(EmployeeServices employeeServices) {
         this.employeeServices = employeeServices;
     }
 
+    private static final Logger log = LoggerFactory.getLogger(EmployeeController.class);  // Initialize logger
 
     // GET: Retrieve employee details by phone number
     @GetMapping("/{phoneNumber}")
@@ -71,14 +69,9 @@ public class EmployeeController {
 
     // POST: Add a new employee
     @PostMapping ("/create")
-    public ResponseEntity<Employee> createEmployee(@RequestBody Employee employee) {
-        try {
-            Employee savedEmployee = employeeService.saveEmployee(employee);
-            return new ResponseEntity<>(savedEmployee, HttpStatus.CREATED);
-        } catch (Exception e) {
-            e.printStackTrace();  // Log the exception
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<Employee> createEmployee(@RequestBody EmployeeDTO employeeDTO) {
+        Employee savedEmployee = employeeServices.createEmployeeFromDTO(employeeDTO);
+        return ResponseEntity.ok(savedEmployee);
     }
 }
 
